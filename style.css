@@ -6,6 +6,9 @@
     --cream: #FFFDE4;
 }
 
+html {
+    font-family: 'Roboto', sans-serif;
+}
 
 body {
     margin: 0;
@@ -25,5 +28,36 @@ body {
 .square {
     width:100px;
     height: 100px;
-    background-color: var(--cyan);
+}
+
+.light {
+    background-color: var(--cream);
+    color: var(--saphire);
+}
+
+.dark {
+    background-color: var(--saphire);
+    color: var(--cream);
+}
+
+.coordinate {
+    position: absolute;
+    font-weight: 700;
+    font-size: 18px;
+    z-index: 1;
+}
+
+.number {
+    left: 2px;
+}
+
+.letter {
+    margin-left: 84px;
+}
+
+.piece {
+    position: relative;
+    z-index: 2;
+    width: 100px;
+    top: 0;
 }
