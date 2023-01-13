@@ -9,11 +9,11 @@ initPieces();
 const flip = document.createElement("button");
 flip.innerText = "flip!"
 flip.addEventListener('click',() => {
-    const isFlipped = document.getElementById("chess-board").id == "h";
+    const isFlipped = document.getElementById("chess-board").children.item(0).id == "h";
     deleteBoard();
     createBoard(!isFlipped);
     initPieces();
 })
-document.body.appendChild(flip);
+document.getElementById("flip-wrapper").appendChild(flip);
 
 /* End of testing */
