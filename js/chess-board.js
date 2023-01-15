@@ -98,22 +98,29 @@ var playingAsWhite = true;
     return letters[index];
  }
 
+ function getRightSquare (coordinates){
+    return getRightColumn(coordinates[0]) + coordinates[1];
+ }
+
+ function getLeftSquare (coordinates) {
+    return getLeftColumn(coordinates[0]) + coordinates[1];
+ }
+
  function capture () {
 
  }
 
-function move (square){
-    const movingPiece = document.getElementsByClassName("selected-piece").item(0);
-    const previousSquare = movingPiece.parentElement;
-    const readPiece = hasPiece(previousSquare);
-    const squareCoords = square.id;
+function move (piece, square) {
+    
+    /* Capture any pieces on target square */
+    for (let index = 0; index < square.children.length; index++) {
+        if (square.children.item(index).classList.contains("piece")){
+            square.children.item(index).remove();
+        }
+    }
 
-    square.appendChild(movingPiece);
+    square.appendChild(piece);
 
-    movingPiece.classList.remove("selected-piece");
-    movingPiece.classList.remove("new");
-    deleteActivePrompts();
-    deleteActivePrompts();
 }
 
 function hasPiece (square) {
@@ -185,7 +192,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
             availableMoves.push(nextSquareCoords);
 
             /* If the pawn is new, if it has not moved, it can move two squares instead of just one */
-            if(!hasPiece(nextNextSquare)[0] && isNew){
+            if(!hasPiece(nextNextSquare)[0] && isNew && white ? row ==2 : row == 7){
                 availableMoves.push(nextNextSquareCoords);
             }
         }
@@ -209,7 +216,78 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 }
             }
         }
+    } else if (piece.classList.contains('R')) {
+        /* Rook */
+        /* ---- Column ----- */
+        /* Top */
+        for (let index = row+1; index <= 8; index++) {
+            const squareCoords = column + index.toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+            if (!readPiece[0]){
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white){
+                    availableMoves.push(squareCoords+"x");
+
+                }
+                break;
+            }
+        }
+        /* Bottom */
+        for (let index = row-1; index >= 1; index--) {
+            const squareCoords = column + index.toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+            if (!readPiece[0]){
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white){
+                    availableMoves.push(squareCoords+"x");
+                }
+                break;
+            }
+        }
+        /* ---- Row ----- */
+        const columnIndex = letters.indexOf(column);
+        /* left */
+        for (let index = columnIndex -1; index >= 0; index--) {
+            const squareCoords = letters[index] + row.toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+
+            if (!readPiece[0]){
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white){
+                    availableMoves.push(squareCoords+"x");
+                }
+                break;
+            }
+        }
+        /* Right */
+        for (let index = columnIndex +1; index <= 7; index++) {
+            const squareCoords = letters[index] + row.toString();
+            console.log(squareCoords);
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+
+            if (!readPiece[0]){
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white){
+                    availableMoves.push(squareCoords+"x");
+                } 
+                break;
+            }
+        }
+
     }
+    console.log(availableMoves);
     return availableMoves;
 }
 
@@ -228,49 +306,68 @@ function displayPrompts (availableMoves) {
 
 function removeSelection(){
     const previousSelectedPieces = document.getElementsByClassName("selected-piece");
+    const previousSelectedSquares = document.getElementsByClassName("selected-square");
     for (let index = 0; index < previousSelectedPieces.length; index++) {
         previousSelectedPieces.item(index).classList.remove("selected-piece");
     }
+    for (let index = 0; index < previousSelectedSquares.length; index++) {
+        previousSelectedSquares.item(index).classList.remove("selected-square");
+    }
 }
 
-function moveHandler (square, readPiece) {
+function moveHandler (square, readPiece, squareHasPrompt) {
 
 
     const updatedSquare = document.getElementById(square.id);
     const coordinates = updatedSquare.id;
+
     
     const piece = updatedSquare.children.item(readPiece[1]);
-    const isWhite = piece.classList.contains("white");
-    const isNew = piece.classList.contains("new");
+    const hasPiece = !(piece == undefined || piece == NaN);
 
-    /* Deleting previous selected piece */
-    removeSelection();
+    /*console.log(hasPiece,squareHasPrompt)*/
+
+    if (hasPiece && !squareHasPrompt){
+        deleteActivePrompts();
+        deleteActivePrompts();
+        removeSelection();
+        
+        const isNew = piece.classList.contains("new");
+        const isWhite = piece.classList.contains("white");
+        piece.classList.add("selected-piece");
+        updatedSquare.classList.add("selected-square");
+
+        displayPrompts(possibleMoves(coordinates, piece, isNew, isWhite));
+
+    } else if (squareHasPrompt) {
+        const selectedPiece = document.getElementsByClassName("selected-piece").item(0);
+        
+        move(selectedPiece,updatedSquare);
+
+        removeSelection()
+        deleteActivePrompts();
+        deleteActivePrompts();
+    } else {
+        removeSelection()
+        deleteActivePrompts();
+        deleteActivePrompts();
+    }
     
-    /* Saving piece selection */
-    piece.classList.add("selected-piece");
-    
-    displayPrompts(possibleMoves(coordinates,piece,isNew,isWhite));
 }
 
  function onSquareClick (square) {
 
     const readPiece = hasPiece(square);
-    /* If the clicked square doesn't have a piece, hasPiece() returns an array with a boolean representing if there is a piece and the index of that piece. */
-    if (!readPiece[0]){
-        var squareHasPrompt = false;
+    const squareHasPrompt = () => {
         for (let index = 0; index < square.children.length; index++) {
-            squareHasPrompt = square.children.item(index).classList.contains("move-prompt") || square.children.item(index).classList.contains("capture-prompt");
-            if (squareHasPrompt) {
-                move(square);
-                break;
+            if (square.children.item(index).classList.contains("move-prompt") || square.children.item(index).classList.contains("capture-prompt")){
+                return true;
             }
         }
-    } else {
-        deleteActivePrompts();
-        deleteActivePrompts();
-        
-        moveHandler(square, readPiece);
+        return false;
     }
+    /* If the clicked square doesn't have a piece, hasPiece() returns an array with a boolean representing if there is a piece and the index of that piece. */
+    moveHandler(square,readPiece,squareHasPrompt());
 
     
 
