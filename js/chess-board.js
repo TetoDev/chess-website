@@ -1,4 +1,4 @@
- const defaultLayout = {
+const defaultLayout = {
     a1: "wR",
     b1: "wN",
     c1: "wB",
@@ -39,9 +39,9 @@
     f3: "wP"
 
     /* End of Testing */
- }
+}
 
- const letters = [
+const letters = [
     'a',
     'b',
     'c',
@@ -61,11 +61,11 @@ const numbers = [
     7,
     8
 ];
- 
+
 var playingAsWhite = true;
- 
- /* Piece initialization */
- export function initPieces (layout=defaultLayout) {
+
+/* Piece initialization */
+export function initPieces(layout = defaultLayout) {
     for (const tile in layout) {
         const square = document.getElementById(tile);
         /* Creating img element for displaying the pieces accordingly.*/
@@ -75,46 +75,42 @@ var playingAsWhite = true;
 
         const isWhite = layout[tile][0] == 'w';
 
-        img.classList.add("piece",isWhite ? "white" : "black", layout[tile][1], "new");
+        img.classList.add("piece", isWhite ? "white" : "black", layout[tile][1], "new");
 
 
         square.appendChild(img);
     }
- }
+}
 
- function getLeftColumn (column) {
+function getLeftColumn(column) {
     const index = letters.indexOf(column) - 1;
     if (index < 0) {
         return "n"
     }
     return letters[index];
- }
+}
 
- function getRightColumn (column) {
+function getRightColumn(column) {
     const index = letters.indexOf(column) + 1;
     if (index >= letters.length) {
         return "n"
     }
     return letters[index];
- }
+}
 
- function getRightSquare (coordinates){
+function getRightSquare(coordinates) {
     return getRightColumn(coordinates[0]) + coordinates[1];
- }
+}
 
- function getLeftSquare (coordinates) {
+function getLeftSquare(coordinates) {
     return getLeftColumn(coordinates[0]) + coordinates[1];
- }
+}
 
- function capture () {
+function capture() {}
 
- }
-
-function move (piece, square) {
-    
-    /* Capture any pieces on target square */
+function move(piece, square) { /* Capture any pieces on target square */
     for (let index = 0; index < square.children.length; index++) {
-        if (square.children.item(index).classList.contains("piece")){
+        if (square.children.item(index).classList.contains("piece")) {
             square.children.item(index).remove();
         }
     }
@@ -123,13 +119,14 @@ function move (piece, square) {
 
 }
 
-function hasPiece (square) {
-    if (square.children.length === 0) {
+function hasPiece(square) {
+
+    if (square == NaN || square == undefined) {
         return [false, -1];
     }
 
-    if (square == NaN || square == undefined){
-        return [false,-1];
+    if (square.children.length === 0) {
+        return [false, -1];
     }
 
     for (let index = 0; index < square.children.length; index++) {
@@ -138,9 +135,9 @@ function hasPiece (square) {
         }
     }
     return [false, -1];
- }
+}
 
-function deleteActivePrompts () {
+function deleteActivePrompts() {
     const activeMovePrompts = document.getElementsByClassName("move-prompt");
     for (let index = 0; index < activeMovePrompts.length; index++) {
         activeMovePrompts.item(0).remove();
@@ -153,7 +150,7 @@ function deleteActivePrompts () {
 }
 
 /* Creating move prompts and capture prompts */
-function createMovePrompt (capture){
+function createMovePrompt(capture) {
     const prompt = document.createElement("div");
     if (capture) {
         prompt.classList.add("capture-prompt");
@@ -163,7 +160,7 @@ function createMovePrompt (capture){
     return prompt;
 }
 
-function placeMovePrompt(coordinates,prompt){
+function placeMovePrompt(coordinates, prompt) {
     const square = document.getElementById(coordinates);
     if (square == NaN || square == undefined) {
         return;
@@ -178,74 +175,74 @@ function possibleMoves(coordinates, piece, isNew, white) {
     if (piece.classList.contains("P")) {
         /* Pawn */
         /* Defining potentially available squares and their coords */
-        const nextSquareCoords = white ? column+(row+1).toString() : column+(row-1).toString();
-        const nextNextSquareCoords = white ? column+(row+2).toString() : column+(row-2).toString();
-        const leftNextSquareCoords = white ? getLeftColumn(column)+(row+1).toString() : getRightColumn(column)+(row-1).toString();
-        const rightNextSquareCoords = white ? getRightColumn(column)+(row+1).toString() : getLeftColumn(column)+(row-1).toString();
+        const nextSquareCoords = white ? column + (row + 1).toString() : column + (row - 1).toString();
+        const nextNextSquareCoords = white ? column + (row + 2).toString() : column + (row - 2).toString();
+        const leftNextSquareCoords = white ? getLeftColumn(column) + (row + 1).toString() : getRightColumn(column) + (row - 1).toString();
+        const rightNextSquareCoords = white ? getRightColumn(column) + (row + 1).toString() : getLeftColumn(column) + (row - 1).toString();
 
         const nextSquare = document.getElementById(nextSquareCoords);
         const nextNextSquare = document.getElementById(nextNextSquareCoords);
         const leftNextSquare = !(leftNextSquareCoords[0] == 'n') ? document.getElementById(leftNextSquareCoords) : undefined;
         const rightNextSquare = !(rightNextSquareCoords[0] == 'n') ? document.getElementById(rightNextSquareCoords) : undefined;
-            
-        if (!hasPiece(nextSquare)[0]){
+
+        if (! hasPiece(nextSquare)[0]) {
             availableMoves.push(nextSquareCoords);
 
             /* If the pawn is new, if it has not moved, it can move two squares instead of just one */
-            if(!hasPiece(nextNextSquare)[0] && isNew && white ? row ==2 : row == 7){
+            if (! hasPiece(nextNextSquare)[0] && isNew && (white ? row == 2 : row == 7)) {
                 availableMoves.push(nextNextSquareCoords);
             }
         }
-        
+
         /* Pawn captures */
         /* first checking if the square exist, then checking if there is pieces on that square - hasPieces() */
-        if (leftNextSquare != undefined){
+        if (leftNextSquare != undefined) {
             const readPiece = hasPiece(leftNextSquare);
-            if (readPiece[0]){
-                /* ? ternary operator to take into consideration the color of the pieces for the capture */ 
-                if (white ? leftNextSquare.children.item(readPiece[1]).classList.contains("black") : leftNextSquare.children.item(readPiece[1]).classList.contains("white")){
+            if (readPiece[0]) { /* ? ternary operator to take into consideration the color of the pieces for the capture */
+                if (white ? leftNextSquare.children.item(readPiece[1]).classList.contains("black") : leftNextSquare.children.item(readPiece[1]).classList.contains("white")) {
                     availableMoves.push(leftNextSquareCoords + 'x');
                 }
             }
         }
-        if (rightNextSquare != undefined){
+        if (rightNextSquare != undefined) {
             const readPiece = hasPiece(rightNextSquare);
-            if (readPiece[0]){
-                if (white ? rightNextSquare.children.item(readPiece[1]).classList.contains("black") : rightNextSquare.children.item(readPiece[1]).classList.contains("white")){
-                    availableMoves.push(rightNextSquareCoords+'x');
+            if (readPiece[0]) {
+                if (white ? rightNextSquare.children.item(readPiece[1]).classList.contains("black") : rightNextSquare.children.item(readPiece[1]).classList.contains("white")) {
+                    availableMoves.push(rightNextSquareCoords + 'x');
                 }
             }
         }
-    } else if (piece.classList.contains('R')) {
-        /* Rook */
+    }
+    if (piece.classList.contains('R') || piece.classList.contains("Q")) {
+        /* Rook and Queen*/
         /* ---- Column ----- */
         /* Top */
-        for (let index = row+1; index <= 8; index++) {
+        for (let index = row + 1; index <= 8; index++) {
             const squareCoords = column + index.toString();
             const square = document.getElementById(squareCoords);
             const readPiece = hasPiece(square);
-            if (!readPiece[0]){
+            if (! readPiece[0]) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white){
-                    availableMoves.push(squareCoords+"x");
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
 
                 }
                 break;
             }
         }
         /* Bottom */
-        for (let index = row-1; index >= 1; index--) {
+        for (let index = row - 1; index >= 1; index--) {
             const squareCoords = column + index.toString();
             const square = document.getElementById(squareCoords);
             const readPiece = hasPiece(square);
-            if (!readPiece[0]){
+            if (! readPiece[0]) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white){
-                    availableMoves.push(squareCoords+"x");
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
                 }
                 break;
             }
@@ -253,46 +250,162 @@ function possibleMoves(coordinates, piece, isNew, white) {
         /* ---- Row ----- */
         const columnIndex = letters.indexOf(column);
         /* left */
-        for (let index = columnIndex -1; index >= 0; index--) {
+        for (let index = columnIndex - 1; index >= 0; index--) {
             const squareCoords = letters[index] + row.toString();
             const square = document.getElementById(squareCoords);
             const readPiece = hasPiece(square);
 
-            if (!readPiece[0]){
+            if (! readPiece[0]) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white){
-                    availableMoves.push(squareCoords+"x");
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
                 }
                 break;
             }
         }
         /* Right */
-        for (let index = columnIndex +1; index <= 7; index++) {
+        for (let index = columnIndex + 1; index <= 7; index++) {
             const squareCoords = letters[index] + row.toString();
-            console.log(squareCoords);
             const square = document.getElementById(squareCoords);
             const readPiece = hasPiece(square);
 
-            if (!readPiece[0]){
+            if (! readPiece[0]) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white){
-                    availableMoves.push(squareCoords+"x");
-                } 
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
+                }
                 break;
             }
         }
 
     }
+    if (piece.classList.contains("B") || piece.classList.contains("Q")) {
+        /* Bishop and Queen*/
+        /* top left */
+        const columnIndex = letters.indexOf(column);
+        var rowCounter = 1;
+        for (let index = columnIndex - 1; index >= 0; index--) {
+            const rowMove = row + rowCounter;
+            if (rowMove > 8) 
+                break;
+            
+            rowCounter = rowCounter + 1;
+            const squareCoords = letters[index] + (rowMove).toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+
+            if (! readPiece[0]) {
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
+                }
+                break;
+            }
+        }
+        /* top right */
+        rowCounter = 1
+        for (let index = columnIndex + 1; index < 8; index++) {
+            const rowMove = row + rowCounter;
+            if (rowMove > 8) 
+                break;
+            
+            rowCounter = rowCounter + 1;
+            const squareCoords = letters[index] + (rowMove).toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+
+            if (! readPiece[0]) {
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
+                }
+                break;
+            }
+        }
+        /* Bottom left */
+        rowCounter = 1;
+        for (let index = columnIndex - 1; index >= 0; index--) {
+            const rowMove = row - rowCounter;
+            if (rowMove < 1) 
+                break;
+            
+            rowCounter = rowCounter + 1;
+            const squareCoords = letters[index] + (rowMove).toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+
+            if (! readPiece[0]) {
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
+                }
+                break;
+            }
+        }
+        /* Bottom right */
+        rowCounter = 1
+        for (let index = columnIndex + 1; index < 8; index++) {
+            const rowMove = row - rowCounter;
+            if (rowMove < 1) 
+                break;
+            
+            rowCounter = rowCounter + 1;
+            const squareCoords = letters[index] + (rowMove).toString();
+            const square = document.getElementById(squareCoords);
+            const readPiece = hasPiece(square);
+
+            if (! readPiece[0]) {
+                availableMoves.push(squareCoords);
+            } else {
+                const piece = square.children.item(readPiece[1]);
+                if (piece.classList.contains("white") != white) {
+                    availableMoves.push(squareCoords + "x");
+                }
+                break;
+            }
+        }
+    }
+    if (piece.classList.contains("K")){
+        /* King */
+
+        const leftColumnElement = document.getElementById(getLeftColumn(column));
+        const columnElement = document.getElementById(column);
+        const rightColumnElement = document.getElementById(getRightColumn(column));
+        const columns = [leftColumnElement,columnElement,rightColumnElement];
+
+        columns.forEach((availableColumn) => {
+            for (let index = row-1; 0 <= index < row +1; index++) {
+                const squareCoords = availableColumn.id + index.toString();
+                const square = document.getElementById(squareCoords);
+                const readPiece = hasPiece(square);
+
+                if(readPiece[0]){
+                    const piece = square.children.item(readPiece[1]);
+
+                    if(piece.classList.contains("white") != white){
+                        availableMoves.push(squareCoords+"x");
+                    }
+                } else {
+                    availableMoves.push(squareCoords);
+                }
+            }
+        })
+    }
     console.log(availableMoves);
     return availableMoves;
 }
 
-/* Add logic to account for capture prompts WOP WOP WOP WOP */
-function displayPrompts (availableMoves) {
+function displayPrompts(availableMoves) {
     deleteActivePrompts();
     /* Placing prompts */
     availableMoves.forEach((coordinate) => {
@@ -300,11 +413,11 @@ function displayPrompts (availableMoves) {
         if (isCapture) {
             coordinate = coordinate[0] + coordinate[1];
         }
-        placeMovePrompt(coordinate,createMovePrompt(isCapture))
+        placeMovePrompt(coordinate, createMovePrompt(isCapture))
     })
 }
 
-function removeSelection(){
+function removeSelection() {
     const previousSelectedPieces = document.getElementsByClassName("selected-piece");
     const previousSelectedSquares = document.getElementsByClassName("selected-square");
     for (let index = 0; index < previousSelectedPieces.length; index++) {
@@ -315,23 +428,23 @@ function removeSelection(){
     }
 }
 
-function moveHandler (square, readPiece, squareHasPrompt) {
+function moveHandler(square, readPiece, squareHasPrompt) {
 
 
     const updatedSquare = document.getElementById(square.id);
     const coordinates = updatedSquare.id;
 
-    
+
     const piece = updatedSquare.children.item(readPiece[1]);
     const hasPiece = !(piece == undefined || piece == NaN);
 
     /*console.log(hasPiece,squareHasPrompt)*/
 
-    if (hasPiece && !squareHasPrompt){
+    if (hasPiece && ! squareHasPrompt) {
         deleteActivePrompts();
         deleteActivePrompts();
         removeSelection();
-        
+
         const isNew = piece.classList.contains("new");
         const isWhite = piece.classList.contains("white");
         piece.classList.add("selected-piece");
@@ -341,8 +454,8 @@ function moveHandler (square, readPiece, squareHasPrompt) {
 
     } else if (squareHasPrompt) {
         const selectedPiece = document.getElementsByClassName("selected-piece").item(0);
-        
-        move(selectedPiece,updatedSquare);
+
+        move(selectedPiece, updatedSquare);
 
         removeSelection()
         deleteActivePrompts();
@@ -352,36 +465,31 @@ function moveHandler (square, readPiece, squareHasPrompt) {
         deleteActivePrompts();
         deleteActivePrompts();
     }
-    
+
 }
 
- function onSquareClick (square) {
+function onSquareClick(square) {
 
     const readPiece = hasPiece(square);
     const squareHasPrompt = () => {
         for (let index = 0; index < square.children.length; index++) {
-            if (square.children.item(index).classList.contains("move-prompt") || square.children.item(index).classList.contains("capture-prompt")){
+            if (square.children.item(index).classList.contains("move-prompt") || square.children.item(index).classList.contains("capture-prompt")) {
                 return true;
             }
         }
         return false;
     }
     /* If the clicked square doesn't have a piece, hasPiece() returns an array with a boolean representing if there is a piece and the index of that piece. */
-    moveHandler(square,readPiece,squareHasPrompt());
+    moveHandler(square, readPiece, squareHasPrompt());
 
-    
-
-    
-    
-    
- }
+}
 
 export function createBoard(flipped = false) {
     const board = document.createElement("div");
     board.classList.add("board");
 
     /*If the chess board is filpped, that means that we are playing with black and coordinates must be adjusted acordingly */
-    
+
     board.id = "chess-board";
 
     /* Flipping coordinates in the case that the board is flipped */
@@ -389,8 +497,7 @@ export function createBoard(flipped = false) {
     const rows = flipped ? numbers : numbers.reverse();
 
     var wasLastLight = false;
-    columns.forEach((letter) => {
-        /* Creating columns and assigning their respective chess notation */
+    columns.forEach((letter) => { /* Creating columns and assigning their respective chess notation */
         const column = document.createElement("div");
         column.classList.add("column");
         column.id = letter;
@@ -416,7 +523,7 @@ export function createBoard(flipped = false) {
             column.append(square);
 
             /* Same color tile when it passes from column to column */
-            wasLastLight = index == array.length - 1 ? !wasLastLight : wasLastLight;
+            wasLastLight = index == array.length - 1 ? ! wasLastLight : wasLastLight;
 
         });
 
@@ -429,7 +536,7 @@ export function createBoard(flipped = false) {
     for (let index = 0; index < firstColumn.children.length; index++) {
         const rowCoordinate = document.createElement("div");
         rowCoordinate.innerText = firstColumn.children.item(index).id[1];
-        rowCoordinate.classList.add("coordinate","number");
+        rowCoordinate.classList.add("coordinate", "number");
 
         /*Adding coordinate to left squares*/
         firstColumn.children.item(index).appendChild(rowCoordinate);
@@ -439,32 +546,30 @@ export function createBoard(flipped = false) {
     for (let index = 0; index < board.children.length; index++) {
         const columnCoordinate = document.createElement("div");
         columnCoordinate.innerText = board.children.item(index).id[0];
-        columnCoordinate.classList.add("coordinate","letter");
+        columnCoordinate.classList.add("coordinate", "letter");
 
         /*Adding coordinate to bottom squares*/
         board.children.item(index).children.item(7).appendChild(columnCoordinate);
     }
-    
+
     /* Adding board to DOM */
     document.getElementById("board-wrapper").appendChild(board);
 
 }
 
-export function saveLayout () {
+export function saveLayout() {}
 
-}
-
-export function deleteBoard (){
+export function deleteBoard() {
     document.getElementById("chess-board").remove();
 }
 
-export function flipBoard (){
+export function flipBoard() {
     const isFlipped = document.getElementById("chess-board").children.item(0).id == "h";
-    
+
 }
 
 
 /* WORK ON THIS FOR THE NEXT TIME */
-export function updatePieces () {
+export function updatePieces() {
     return 0;
 }
