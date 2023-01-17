@@ -383,8 +383,10 @@ function possibleMoves(coordinates, piece, isNew, white) {
         const rightColumnElement = document.getElementById(getRightColumn(column));
         const columns = [leftColumnElement,columnElement,rightColumnElement];
 
+
         columns.forEach((availableColumn) => {
-            for (let index = row-1; 0 <= index < row +1; index++) {
+            if (availableColumn == undefined) return;
+            for (let index = row-1; index <= row +1; index++) {
                 const squareCoords = availableColumn.id + index.toString();
                 const square = document.getElementById(squareCoords);
                 const readPiece = hasPiece(square);
@@ -398,6 +400,46 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 } else {
                     availableMoves.push(squareCoords);
                 }
+            }
+        })
+    }
+    if (piece.classList.contains("N")){
+        /* Knight */
+        /* Top */
+        const topSquareCoords = column + (row+2).toString();
+        const topLeft = document.getElementById(getLeftSquare(topSquareCoords));
+        const topRight = document.getElementById(getRightSquare(topSquareCoords));
+
+        /* Bottom */
+        const bottomSquareCoords = column + (row - 2).toString();
+        const bottomLeft = document.getElementById(getLeftSquare(bottomSquareCoords));
+        const bottomRight = document.getElementById(getRightSquare(bottomSquareCoords));
+
+        /* Left */
+        const leftSquareCoords = getLeftColumn(getLeftColumn(column)) + row.toString();
+        const leftTop = document.getElementById(leftSquareCoords[0] + (row + 1).toString());
+        const leftBottom = document.getElementById(leftSquareCoords[0] + (row -1).toString());
+
+        /* Right */
+        const rightSquareCoords = getRightColumn(getRightColumn(column)) + row.toString();
+        const rightTop = document.getElementById(rightSquareCoords[0] + (row +1).toString());
+        const rightBottom = document.getElementById(rightSquareCoords[0] + (row-1).toString());
+
+        /* Checking squares */
+        const possibleSquares = [topLeft,topRight,bottomLeft,bottomRight,leftTop,leftBottom,rightTop,rightBottom];
+        console.log(possibleSquares);
+        possibleSquares.forEach((possibleSquare) => {
+            if (possibleSquare == undefined || possibleSquare == NaN) return;
+            const readPiece = hasPiece(possibleSquare);
+
+            if(readPiece[0]){
+                const piece = possibleSquare.children.item(readPiece[1]);
+
+                if(piece.classList.contains("white") != white){
+                    availableMoves.push(possibleSquare.id+"x");
+                }
+            } else {
+                availableMoves.push(possibleSquare.id);
             }
         })
     }
