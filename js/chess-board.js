@@ -92,7 +92,7 @@ function getLeftColumn(column) {
 
 function getRightColumn(column) {
     const index = letters.indexOf(column) + 1;
-    if (index >= letters.length) {
+    if (index >= letters.length || column == "n") {
         return "n"
     }
     return letters[index];
@@ -106,7 +106,9 @@ function getLeftSquare(coordinates) {
     return getLeftColumn(coordinates[0]) + coordinates[1];
 }
 
-function capture() {}
+function isKing (piece) {
+    return piece.classList.contains("K");
+}
 
 function move(piece, square) { /* Capture any pieces on target square */
     for (let index = 0; index < square.children.length; index++) {
@@ -199,7 +201,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
         if (leftNextSquare != undefined) {
             const readPiece = hasPiece(leftNextSquare);
             if (readPiece[0]) { /* ? ternary operator to take into consideration the color of the pieces for the capture */
-                if (white ? leftNextSquare.children.item(readPiece[1]).classList.contains("black") : leftNextSquare.children.item(readPiece[1]).classList.contains("white")) {
+                if (white != leftNextSquare.children.item(readPiece[1]).classList.contains("white") && !isKing(leftNextSquare.children.item(readPiece[1]))) {
                     availableMoves.push(leftNextSquareCoords + 'x');
                 }
             }
@@ -207,7 +209,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
         if (rightNextSquare != undefined) {
             const readPiece = hasPiece(rightNextSquare);
             if (readPiece[0]) {
-                if (white ? rightNextSquare.children.item(readPiece[1]).classList.contains("black") : rightNextSquare.children.item(readPiece[1]).classList.contains("white")) {
+                if (white != rightNextSquare.children.item(readPiece[1]).classList.contains("white") && !isKing(rightNextSquare.children.item(readPiece[1]))) {
                     availableMoves.push(rightNextSquareCoords + 'x');
                 }
             }
@@ -225,7 +227,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
 
                 }
@@ -241,7 +243,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -259,7 +261,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -275,7 +277,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -302,7 +304,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -324,7 +326,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -346,7 +348,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -368,7 +370,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 availableMoves.push(squareCoords);
             } else {
                 const piece = square.children.item(readPiece[1]);
-                if (piece.classList.contains("white") != white) {
+                if (piece.classList.contains("white") != white && !isKing(piece)) {
                     availableMoves.push(squareCoords + "x");
                 }
                 break;
@@ -394,7 +396,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
                 if(readPiece[0]){
                     const piece = square.children.item(readPiece[1]);
 
-                    if(piece.classList.contains("white") != white){
+                    if(piece.classList.contains("white") != white && !isKing(piece)){
                         availableMoves.push(squareCoords+"x");
                     }
                 } else {
@@ -427,7 +429,6 @@ function possibleMoves(coordinates, piece, isNew, white) {
 
         /* Checking squares */
         const possibleSquares = [topLeft,topRight,bottomLeft,bottomRight,leftTop,leftBottom,rightTop,rightBottom];
-        console.log(possibleSquares);
         possibleSquares.forEach((possibleSquare) => {
             if (possibleSquare == undefined || possibleSquare == NaN) return;
             const readPiece = hasPiece(possibleSquare);
@@ -435,7 +436,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
             if(readPiece[0]){
                 const piece = possibleSquare.children.item(readPiece[1]);
 
-                if(piece.classList.contains("white") != white){
+                if(piece.classList.contains("white") != white && !isKing(piece)){
                     availableMoves.push(possibleSquare.id+"x");
                 }
             } else {
@@ -443,7 +444,6 @@ function possibleMoves(coordinates, piece, isNew, white) {
             }
         })
     }
-    console.log(availableMoves);
     return availableMoves;
 }
 
@@ -599,14 +599,16 @@ export function createBoard(flipped = false) {
 
 }
 
-export function saveLayout() {}
+export function saveLayout() {
+
+}
 
 export function deleteBoard() {
     document.getElementById("chess-board").remove();
 }
 
-export function flipBoard() {
-    const isFlipped = document.getElementById("chess-board").children.item(0).id == "h";
+export function isBoardFlipped() {
+    return document.getElementById("chess-board").children.item(0).id == "h";
 
 }
 

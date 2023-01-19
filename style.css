@@ -11,9 +11,46 @@ html {
     font-family: 'Roboto', sans-serif;
 }
 
+@keyframes animateBackground {
+    0% {
+        background-position: 0 100%, 100% 0;
+    }
+    50% {
+        background-position: 100% 100%, 0 0;  
+    }
+    100% {
+        background-position: 0 100%, 100% 0;
+    }
+}
+
 body {
     margin: 0;
     padding: 0;
+    background-image: url("./img/background/bg.svg"), url("./img/background/bgflipped.svg");
+    background-repeat: no-repeat;
+    background-position: bottom, top;
+    background-size: 180%;
+    background-color: var(--saphire);
+    height: 100vh;
+    animation: animateBackground 20s ease-in-out alternate;
+    animation-iteration-count: infinite;
+}
+
+
+#game-wrapper {
+    display: flex;
+    justify-content: center;
+    vertical-align: middle;
+    align-items: center;
+    height: 100vh;
+}
+
+#board-wrapper {
+    display: block;
+    border-radius: 2px;
+    border-width: 16px;
+    border-style: solid;
+    border-color: var(--royal);
 }
 
 #chess-board {
@@ -24,6 +61,17 @@ body {
     width: 800px;
     height: 800px;
 
+}
+
+#details-wrapper {
+    display: block;
+    background-color: var(--royal);
+    height: 800px;
+    width: 400px;
+    border-radius: 2px;
+    border-width: 16px;
+    border-style: solid;
+    border-color: var(--royal);
 }
 
 .square {
@@ -99,4 +147,8 @@ body {
     border-width: 5px;
     border-color: rgba(27, 27, 27, 0.5);
     z-index: 10;
+}
+
+.hidden {
+    visibility: hidden;
 }
