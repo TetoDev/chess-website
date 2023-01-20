@@ -30,15 +30,7 @@ const defaultLayout = {
     e7: "bP",
     f7: "bP",
     g7: "bP",
-    h7: "bP",
-
-    /*Testing */
-    e4: "wP",
-    e5: "bP",
-    d5: "bP",
-    f3: "wP"
-
-    /* End of Testing */
+    h7: "bP"
 }
 
 const letters = [
@@ -62,10 +54,10 @@ const numbers = [
     8
 ];
 
-var playingAsWhite = true;
+var game = undefined;
 
 /* Piece initialization */
-export function initPieces(layout = defaultLayout) {
+function initPieces(layout = defaultLayout) {
     for (const tile in layout) {
         const square = document.getElementById(tile);
         /* Creating img element for displaying the pieces accordingly.*/
@@ -170,6 +162,10 @@ function placeMovePrompt(coordinates, prompt) {
     square.appendChild(prompt);
 }
 
+export function setGame (instance) {
+    game = instance;
+}
+
 function possibleMoves(coordinates, piece, isNew, white) {
     const column = coordinates[0];
     const row = parseInt(coordinates[1]);
@@ -200,7 +196,7 @@ function possibleMoves(coordinates, piece, isNew, white) {
         /* first checking if the square exist, then checking if there is pieces on that square - hasPieces() */
         if (leftNextSquare != undefined) {
             const readPiece = hasPiece(leftNextSquare);
-            if (readPiece[0]) { /* ? ternary operator to take into consideration the color of the pieces for the capture */
+            if (readPiece[0]) { 
                 if (white != leftNextSquare.children.item(readPiece[1]).classList.contains("white") && !isKing(leftNextSquare.children.item(readPiece[1]))) {
                     availableMoves.push(leftNextSquareCoords + 'x');
                 }
@@ -596,7 +592,8 @@ export function createBoard(flipped = false) {
 
     /* Adding board to DOM */
     document.getElementById("board-wrapper").appendChild(board);
-
+    /* Initializing pieces */
+    initPieces();
 }
 
 export function saveLayout() {
@@ -610,6 +607,12 @@ export function deleteBoard() {
 export function isBoardFlipped() {
     return document.getElementById("chess-board").children.item(0).id == "h";
 
+}
+
+export function flipBoard () {
+    const flipped = isBoardFlipped();
+    deleteBoard();
+    createBoard(!flipped);
 }
 
 
